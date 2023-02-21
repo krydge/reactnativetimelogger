@@ -74,7 +74,7 @@ export default function App() {
       {client!=""&&
         <ClientInfo client={client}></ClientInfo>
       }
-      <StatusBar style="auto" />
+
     </View>
   );
 }

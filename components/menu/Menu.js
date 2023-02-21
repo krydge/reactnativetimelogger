@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     menuButton: {
         padding: 15,
         width: '33.3333333333%',
-        marginTop: 33,
         backgroundColor: '#fff666',
         alignItems:'center',
     }

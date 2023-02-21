@@ -5,7 +5,6 @@ import { TimeLog } from '../../Models/TimeLog';
 function ClientInfo(params) {
     const [client, setClient] = useState(params.client)
     const [time, setTime] = useState(false)
-    console.log(client)
     const trackTime =(e)=>{
         setTime(true)
         let timer= new TimeLog()
