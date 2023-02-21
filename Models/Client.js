@@ -8,7 +8,11 @@ class Client {
         this.rate = 80;
         this.totaltime = 0;
         this.timeLogs = [];
-        this.billingTimeFrame = billingTimeFrame
+        this.billingTimeFrame = billingTimeFrame;
+        this.signedContract="not Signed yet"
+    }
+    addContract(){
+
     }
 }
 
