@@ -1,80 +1,65 @@
-import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Client } from './Models/Client'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useReducer } from 'react';
 import Menu from './components/menu/Menu';
 import ViewClients from './components/ViewClients/ViewClients';
 import AddClient from './components/AddClient/AddClient';
-import ClientInfo from './components/ClientInfo/ClientInfo';
-const testClient = new Client("RydgeSoftware", "kaydon stubbs", "4352622247", "test@gmail.com", "English", Date.now(), "Febuary,20,2024", "BiWeekly")
+import Stats from './components/Stats/Stats'
+import axios from "axios"
+
+
+const baseUrl = "https://rydgesoftwaretimeloggingapi.onrender.com/clients"
+
+async function getClients() {
+  const response = await axios.get(baseUrl)
+  let apiclients = parseClients(response.data)
+  return apiclients
+}
+
+function parseClients(clients) {
+  let clientList = []
+  clients.map((c) => {
+    clientList.push(new Client(c.companyname, c.contactname, c.phonenumber, c.email, c.preferredlanguage, c.startdate, c.enddate, c.preferredlanguage, c.billingtimeframe,c.id, c.rate, c.signedcontract))
+  })
+  return clientList
+}
+function useForceUpdate() {
+  let [value, setState] = useState(true);
+  return () => setState(!value);
+}
 export default function App() {
-  const [clients, setClients] = useState([testClient])
+  const [ignored, forcedUpdate] = useReducer(x => x + 1, 0)
+  const [clients, setClients] = useState([])
   const [addClient, setAddClient] = useState(false)
   const [viewClients, setViewClients] = useState(false)
-  const [client, setClient]= useState(false)
-  const [clientName, setClientName] = useState("")
-  const [contactName, setContactName] = useState("")
-  const [contactPhone, setContactPhone] = useState("")
-  const [contactEmail, setContactEmail] = useState("")
-  const [contactLanguage, setContactLanguage] = useState("")
-  const [endTime, setEndTime] = useState("")
-  const [billPeriod, setBillPeriod] = useState("")
-  const [view, setView] = useState("stats")
+  const [client, setClient] = useState(false)
+  const [view, setView] = useState("Stats")
 
-
-  const handleAdd = (e) => {
-    let client = new Client(clientName, contactName, contactPhone, contactEmail, contactLanguage, Date.now(), endTime, billPeriod)
-    if (client.clientName != "") {
-      alert(client.clientName)
-      let c = clients;
-      c.push(client);
-      setClients(c);
-      clearNewContactInfo()
-      setAddClient(false)
+  useEffect(() => {
+    async function fetchData() {
+      setClients(await getClients())
     }
-    else {
-      alert("Client info missing. Client will not be added")
-      setAddClient(false)
-    }
+    fetchData()
+  }, [forcedUpdate]);
 
-  }
-  const handlAddClient = (e) => {
-    setAddClient(true)
-    setViewClients(false)
-  }
-  const handlViewClient = (e) => {
-    setAddClient(false)
-    setViewClients(true)
-  }
-  const handleViewClientInfo = (e)=>{
+
+  const handleViewClientInfo = (e) => {
     setClient(e)
     setAddClient(false)
     setViewClients(false)
   }
-  function clearNewContactInfo() {
-    setClientName("");
-    setContactName("");
-    setContactPhone("")
-    setContactEmail("");
-    setContactLanguage("")
-    setEndTime("")
-    setBillPeriod("")
-  }
+  console.log(clients)
   return (
     <View style={styles.container}>
-      <Menu setView={setView}></Menu>
+      <Menu setView={setView} view={view}></Menu>
       {view == "Clients" &&
-        <ViewClients clients={clients} setClient={handleViewClientInfo}></ViewClients>
-      }{view ==="AddClient" && 
-        <AddClient addClient={handleAdd}  setBillPeriod={setBillPeriod} billPeriod={billPeriod} setEndTime={setEndTime} endTime={endTime} setContactLanguage={setContactLanguage} contactLanguage={contactLanguage} setContactEmail={setContactEmail} contactEmail={contactEmail} clientName={clientName} setClientName={setClientName} contactName={contactName} setContactName={setContactName} contactPhone={contactPhone} setContactPhone={setContactPhone} />
+        <ViewClients clients={clients} setClient={handleViewClientInfo} client={client} clearClient={setClient}></ViewClients>
+      }{view === "AddClient" &&
+        <AddClient update={forcedUpdate} />
       }
-      {view ==="Stats" && 
-        <AddClient addClient={handleAdd}  setBillPeriod={setBillPeriod} billPeriod={billPeriod} setEndTime={setEndTime} endTime={endTime} setContactLanguage={setContactLanguage} contactLanguage={contactLanguage} setContactEmail={setContactEmail} contactEmail={contactEmail} clientName={clientName} setClientName={setClientName} contactName={contactName} setContactName={setContactName} contactPhone={contactPhone} setContactPhone={setContactPhone} />
+      {view === "Stats" &&
+        <Stats clients={clients}></Stats>
       }
-      {client!=""&&
-        <ClientInfo client={client}></ClientInfo>
-      }
-
     </View>
   );
 }
@@ -93,3 +78,4 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
+

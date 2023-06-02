@@ -1,60 +1,122 @@
-import { Button, StyleSheet, Text, View, TextInput, ScrollView, Label, Pressable } from 'react-native';
-import { useEffect, useState } from 'react';
+import {  StyleSheet, Text, View, TextInput, ScrollView, Pressable } from 'react-native';
+import {useState } from 'react';
+import {Client}from '../../Models/Client'
+import axios from "axios"
 
 function AddClient(params) {
+
+    const [clientName, setClientName] = useState("")
+    const [contactName, setContactName] = useState("")
+    const [contactPhone, setContactPhone] = useState("")
+    const [contactEmail, setContactEmail] = useState("")
+    const [contactLanguage, setContactLanguage] = useState("")
+    const [endTime, setEndTime] = useState("")
+    const [billPeriod, setBillPeriod] = useState("")
+    const [projectdescription, setprojectdescription] = useState("")
+
+    function clearNewContactInfo() {
+        setClientName("");
+        setContactName("");
+        setContactPhone("")
+        setContactEmail("");
+        setContactLanguage("")
+        setEndTime("")
+        setBillPeriod("")
+        setprojectdescription("")
+    }
+
+    async function addClient() {
+        let cdata={
+            "companyname": clientName,
+            "contactname": contactName,
+            "phonenumber": contactPhone,
+            "email": contactEmail,
+            "preferredlanguage": contactLanguage,
+            "startdate": String(Date.now()),
+            "enddate": endTime,
+            "rate": 100,
+            "billingtimeframe": billPeriod,
+            "signedcontract": false,
+            "projectdescription": projectdescription
+        }
+        await axios.post("https://rydgesoftwaretimeloggingapi.onrender.com/client",{data:cdata})
+      }
+
+    const handleAdd = async (e) => {
+      
+        if (clientName != "") {
+            console.log("handle add with a name")
+            await addClient()
+            clearNewContactInfo()
+            params.update(true)
+        }
+        else {
+            alert("Client info missing. Client will not be added")
+            
+        }
+
+    }
+
 
     return (
         <ScrollView style={styles.container}>
             <TextInput
                 style={styles.input}
-                onChangeText={params.setClientName}
+                onChangeText={setClientName}
                 name="clientName"
-                value={params.clientName || ""}
+                value={clientName || ""}
                 placeholder={"Business / Client Name"}
             />
             <TextInput
                 style={styles.input}
-                onChangeText={params.setContactName}
+                onChangeText={setContactName}
                 name="contactName"
-                value={params.contactName || ""}
+                value={contactName || ""}
                 placeholder={"Contacts Name"}
             />
             <TextInput
                 style={styles.input}
-                onChangeText={params.setContactPhone}
+                onChangeText={setContactPhone}
                 name="contactPhone"
-                value={params.contactPhone || ""}
+                value={contactPhone || ""}
                 placeholder="Contacts Phone Number"
             />
             <TextInput
                 style={styles.input}
-                onChangeText={params.setContactEmail}
+                onChangeText={setContactEmail}
                 name="contactEmail"
-                value={params.contactEmail || ""}
+                value={contactEmail || ""}
                 placeholder="Contacts Email"
             />
             <TextInput
                 style={styles.input}
-                onChangeText={params.setContactLanguage}
+                onChangeText={setContactLanguage}
                 name="contactLanguage"
-                value={params.contactLanguage || ""}
+                value={contactLanguage || ""}
                 placeholder="Preferred Language"
             />
             <TextInput
                 style={styles.input}
-                onChangeText={params.setEndTime}
+                onChangeText={setEndTime}
                 name="endTime"
-                value={params.endTime || ""}
+                value={endTime || ""}
                 placeholder="Desired Completion Date"
             />
             <TextInput
                 style={styles.input}
-                onChangeText={params.setBillPeriod}
+                onChangeText={setBillPeriod}
                 name="billPeriod"
-                value={params.billPeriod || ""}
+                value={billPeriod || ""}
                 placeholder="Billing Period"
             />
-            <Pressable onPress={()=>params.addClient()} style={styles.submit}><Text>Add Client Info</Text></Pressable>
+            <TextInput
+                style={styles.input}
+                onChangeText={setprojectdescription}
+                name="billPeriod"
+                value={projectdescription || ""}
+                placeholder="Project Description"
+            />
+            <Pressable onPress={handleAdd} style={styles.submit}><Text>Add Client Info</Text></Pressable>
         </ScrollView>
     )
 }
@@ -62,19 +124,19 @@ function AddClient(params) {
 export default AddClient;
 
 const styles = StyleSheet.create({
-    container:{
-        width:'100%',
+    container: {
+        width: '100%',
     },
     input: {
-      height: 40,
-      margin: 12,
-      borderWidth: 1,
-      padding: 10,
-      width:'90%',
+        height: 40,
+        margin: 12,
+        borderWidth: 1,
+        padding: 10,
+        width: '90%',
     },
-    submit:{
-        padding:10,
-        alignItems:'center',
-        backgroundColor:'#fff666'
+    submit: {
+        padding: 10,
+        alignItems: 'center',
+        backgroundColor: '#fff666'
     }
-  });
+});
